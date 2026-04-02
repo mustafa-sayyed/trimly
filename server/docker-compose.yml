@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: always
+    container_name: postgres
+    environment:
+      POSTGRES_USER: trimly
+      POSTGRES_PASSWORD: trimly@2429
+      POSTGRES_DB: trimly
+    ports:
+      - "5432:5432"
+    volumes:
+      - trimly-pgdata:/var/lib/postgresql/data
+    networks:
+      - trimly-network
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - trimly-network
+    
+networks:
+  trimly-network:
+
+volumes:
+  trimly-pgdata:
