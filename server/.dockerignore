@@ -1,0 +1,31 @@
+# Dependency directories (installed during build)
+node_modules/
+npm-debug.log
+
+# Build artifacts
+dist/
+build/
+
+# Git configuration and history
+.git/
+.gitignore
+.github/
+
+# Sensitive environment files
+.env
+.env.*
+.aws/
+.npmrc
+
+# Development and Editor-specific files
+.vscode/
+.idea/
+.eslintcache
+*.log
+coverage/
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+docs/
