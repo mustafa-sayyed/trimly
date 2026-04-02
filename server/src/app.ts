@@ -1,0 +1,21 @@
+import express from "express";
+import cors from "cors";
+import { config } from "./config/config.js";
+import urlRouter from "./routes/url.route.js";
+import userRouter from "./routes/user.route.js";
+import globalErrorHandler  from "./middlewares/errorHandler.middleware.js";
+
+const app = express();
+
+// Middlewares
+app.use(cors({ origin: config.CLIENT_URL, credentials: true }));
+app.use(express.json());
+
+// Routes
+app.use("/api/v1/urls", urlRouter);
+app.use("/api/v1/users", userRouter);
+app.use(globalErrorHandler);
+
+
+
+export default app;
