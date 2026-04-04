@@ -15,10 +15,9 @@ app.use(express.json());
 app.use("/api/v1/urls", urlRouter);
 app.use("/api/v1/users", userRouter);
 
-
-// Health Check 
+// Health Check
 app.get("/health", (req, res) => {
-    res.status(200).json({ success: true, message: "Server is healthy..." });
+  res.status(200).json({ success: true, message: "Server is healthy..." });
 });
 
 // Global Error Handler

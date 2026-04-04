@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
-	deleteUserAccount,
-	getCurrentUser,
-	loginUser,
-	logoutUser,
-	registerUser,
-	updateUserProfile,
+  deleteUserAccount,
+  getCurrentUser,
+  loginUser,
+  logoutUser,
+  registerUser,
+  updateUserProfile,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 

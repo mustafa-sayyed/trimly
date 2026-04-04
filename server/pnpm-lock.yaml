@@ -32,9 +32,6 @@ importers:
       pg:
         specifier: ^8.20.0
         version: 8.20.0
-      prettier:
-        specifier: ^3.8.1
-        version: 3.8.1
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -57,6 +54,9 @@ importers:
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
+      prettier:
+        specifier: ^3.8.1
+        version: 3.8.1
       prisma:
         specifier: ^7.6.0
         version: 7.6.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)

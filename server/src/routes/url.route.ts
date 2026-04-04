@@ -1,12 +1,12 @@
 import { Router } from "express";
 import {
-	createShortUrl,
-	deleteUrl,
-	getAllUrls,
-	getUrlAnalytics,
-	getUrlByShortCode,
-	redirectToOriginalUrl,
-	updateUrl,
+  createShortUrl,
+  deleteUrl,
+  getAllUrls,
+  getUrlAnalytics,
+  getUrlByShortCode,
+  redirectToOriginalUrl,
+  updateUrl,
 } from "../controllers/url.controller.js";
 
 const router = Router();
