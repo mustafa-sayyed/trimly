@@ -7,6 +7,7 @@ import { comparePassword, hashPassword } from "../utils/password.util.js";
 import {
   generateAccessToken,
   generateRefreshToken,
+  verifyRefreshToken,
 } from "../utils/jwt.util.js";
 
 export const registerUser: RequestHandler = asyncHandler(async (req, res) => {
@@ -142,6 +143,60 @@ export const deleteUserAccount: RequestHandler = asyncHandler(
     return res.status(httpStatusCodes.OK).json({
       success: true,
       message: "User account deleted successfully",
+    });
+  },
+);
+
+export const getNewAccessToken: RequestHandler = asyncHandler(
+  async (req, res) => {
+    const refreshToken = req.body?.refreshToken as string;
+
+    if (!refreshToken) {
+      throw new ApiError(
+        httpStatusCodes.UNAUTHORIZED,
+        "Unauthorized, No refresh token provided",
+      );
+    }
+
+    const payload = verifyRefreshToken(refreshToken);
+    if (!payload) {
+      throw new ApiError(
+        httpStatusCodes.UNAUTHORIZED,
+        "Invalid or expired refresh token",
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+    });
+
+    if (!user) {
+      throw new ApiError(
+        httpStatusCodes.BAD_REQUEST,
+        "Invalid or expired refresh token",
+      );
+    }
+
+    if (user.refreshToken !== refreshToken) {
+      throw new ApiError(
+        httpStatusCodes.UNAUTHORIZED,
+        "Invalid or expired refresh token",
+      );
+    }
+
+    const newAccessToken = generateAccessToken(payload);
+    const newRefreshToken = generateRefreshToken(payload);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: newRefreshToken },
+    });
+
+    return res.status(httpStatusCodes.OK).json({
+      success: true,
+      message: "Access token refreshed successfully",
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     });
   },
 );

@@ -23,6 +23,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src", "generated", "server.ts", "src/utils/httpStatusCodes.util.ts"],
+  "include": ["src", "generated", "./*.ts"],
   "exclude": ["dist", "node_modules"]
 }

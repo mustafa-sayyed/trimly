@@ -9,7 +9,8 @@
     "build": "tsc -b",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,css}\""
+    "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,css}\"",
+    "prepare": "cd .. && husky server/.husky"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
+    "husky": "^9.1.7",
     "prettier": "^3.8.1",
     "prisma": "^7.6.0",
     "tsx": "^4.21.0"
