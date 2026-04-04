@@ -1,10 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { config } from "../config/config.js";
-
-interface ApiError extends Error {
-  statusCode?: number;
-  success?: boolean;
-}
+import type { ApiError } from "../types.js";
 
 const globalErrorHandler = (
   err: ApiError,
