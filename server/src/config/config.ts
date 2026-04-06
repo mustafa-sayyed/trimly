@@ -7,6 +7,7 @@ const _config = {
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
   ACCESS_TOKEN_EXPIRY: process.env.ACCESS_TOKEN_EXPIRY!,
   REFRESH_TOKEN_EXPIRY: process.env.REFRESH_TOKEN_EXPIRY!,
+  BASE_URL: process.env.BASE_URL!,
 };
 
 export const config = Object.freeze(_config);
