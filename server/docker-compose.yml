@@ -24,9 +24,20 @@ services:
       - "8080:8080"
     networks:
       - trimly-network
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass "trimly-redis@2429"
     
 networks:
   trimly-network:
 
 volumes:
   trimly-pgdata:
+  redis_data:

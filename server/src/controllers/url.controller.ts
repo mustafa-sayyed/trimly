@@ -162,11 +162,9 @@ export const updateUrl: RequestHandler = async (req, res) => {
   }
 
   if (url.user_id !== req.user?.id) {
-    return res
-      .status(httpStatusCodes.FORBIDDEN)
-      .json({
-        message: "Forbidden: You do not have permission to update this URL",
-      });
+    return res.status(httpStatusCodes.FORBIDDEN).json({
+      message: "Forbidden: You do not have permission to update this URL",
+    });
   }
 
   const updatedUrl = await prisma.url.update({
@@ -204,11 +202,9 @@ export const deleteUrl: RequestHandler = async (req, res) => {
   }
 
   if (url.user_id !== req.user?.id) {
-    return res
-      .status(httpStatusCodes.FORBIDDEN)
-      .json({
-        message: "Forbidden: You do not have permission to delete this URL",
-      });
+    return res.status(httpStatusCodes.FORBIDDEN).json({
+      message: "Forbidden: You do not have permission to delete this URL",
+    });
   }
 
   await prisma.url.delete({
@@ -235,12 +231,10 @@ export const getUrlAnalytics: RequestHandler = async (req, res) => {
   }
 
   if (url.user_id !== req.user?.id) {
-    return res
-      .status(httpStatusCodes.FORBIDDEN)
-      .json({
-        message:
-          "Forbidden: You do not have permission to view analytics for this URL",
-      });
+    return res.status(httpStatusCodes.FORBIDDEN).json({
+      message:
+        "Forbidden: You do not have permission to view analytics for this URL",
+    });
   }
 
   const analytics = await prisma.analytics.findMany({
