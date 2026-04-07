@@ -11,7 +11,7 @@ const _config = {
   REDIS_PASSWORD: process.env.REDIS_PASSWORD!,
   REDIS_HOST: process.env.REDIS_HOST!,
   REDIS_PORT: Number(process.env.REDIS_PORT),
-  REDIS_DB: process.env.REDIS_DB!,
+  REDIS_DB: Number(process.env.REDIS_DB),
 };
 
 export const config = Object.freeze(_config);

@@ -9,6 +9,8 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt.util.js";
+import type { AuthenticatedRequest } from "../types.js";
+import { CACHE_TTL, redis, redisKeys } from "../utils/redis.util.js";
 
 export const registerUser: RequestHandler = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -77,45 +79,53 @@ export const loginUser: RequestHandler = asyncHandler(async (req, res) => {
 });
 
 export const logoutUser: RequestHandler = asyncHandler(async (req, res) => {
-  const userId = req.user?.id;
-
-  if (!userId) {
-    throw new ApiError(httpStatusCodes.UNAUTHORIZED, "Unauthorized");
-  }
+  const { user } = req as AuthenticatedRequest;
 
   const result = await prisma.user.update({
-    where: { id: userId },
+    where: { id: user.id },
     data: { refreshToken: null },
   });
 
-  if (result) {
-    return res.status(httpStatusCodes.OK).json({
-      success: true,
-      message: "User logged out successfully",
-    });
-  } else {
+  if (!result) {
     return res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to log out user",
     });
   }
+
+  const key = redisKeys.user(user.id);
+  await redis.del(key);
+
+  return res.status(httpStatusCodes.OK).json({
+    success: true,
+    message: "User logged out successfully",
+  });
 });
 
 export const getCurrentUser: RequestHandler = asyncHandler(async (req, res) => {
-  const userId = req.user?.id;
+  const { user: authenticatedUser } = req as AuthenticatedRequest;
 
-  if (!userId) {
-    throw new ApiError(httpStatusCodes.UNAUTHORIZED, "Unauthorized");
+  const key = redisKeys.user(authenticatedUser.id);
+  const cachedUser = await redis.get(key);
+
+  if (cachedUser) {
+    return res.status(httpStatusCodes.OK).json({
+      success: true,
+      user: JSON.parse(cachedUser),
+      cached: true,
+    });
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: authenticatedUser.id },
     select: { id: true, email: true, name: true },
   });
 
   if (!user) {
     throw new ApiError(httpStatusCodes.NOT_FOUND, "User not found");
   }
+
+  await redis.setex(key, CACHE_TTL.USER_DATA, JSON.stringify(user));
 
   return res.status(httpStatusCodes.OK).json({
     success: true,
@@ -125,13 +135,9 @@ export const getCurrentUser: RequestHandler = asyncHandler(async (req, res) => {
 
 export const deleteUserAccount: RequestHandler = asyncHandler(
   async (req, res) => {
-    const userId = req.user?.id;
+    const { user } = req as AuthenticatedRequest;
 
-    if (!userId) {
-      throw new ApiError(httpStatusCodes.UNAUTHORIZED, "Unauthorized");
-    }
-
-    const deletedUser = await prisma.user.delete({ where: { id: userId } });
+    const deletedUser = await prisma.user.delete({ where: { id: user.id } });
 
     if (!deletedUser) {
       throw new ApiError(
@@ -139,6 +145,9 @@ export const deleteUserAccount: RequestHandler = asyncHandler(
         "Failed to delete user account",
       );
     }
+
+    const key = redisKeys.user(user.id);
+    await redis.del(key);
 
     return res.status(httpStatusCodes.OK).json({
       success: true,

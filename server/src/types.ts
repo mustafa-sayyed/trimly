@@ -1,3 +1,5 @@
+import type { Request } from "express";
+
 interface TokenPayload {
   id: number;
   email: string;
@@ -15,4 +17,9 @@ interface User {
   name: string;
 }
 
-export type { TokenPayload, ApiError, User };
+interface AuthenticatedRequest extends Request {
+  user: User;
+  accessToken: string;
+}
+
+export type { TokenPayload, ApiError, User, AuthenticatedRequest };

@@ -1,16 +1,15 @@
 import type { RequestHandler } from "express";
 import { prisma } from "../db/index.js";
 import { config } from "../config/config.js";
+import asyncHandler from "../utils/asyncHandler.util.js";
 import { generateUniqueShortCode } from "../utils/uniqueShortCode.util.js";
 import httpStatusCodes from "../utils/httpStatusCodes.util.js";
+import type { AuthenticatedRequest } from "../types.js";
+import { redis, redisKeys, CACHE_TTL } from "../utils/redis.util.js";
 
-export const createShortUrl: RequestHandler = async (req, res) => {
+export const createShortUrl: RequestHandler = asyncHandler(async (req, res) => {
+  const { user } = req as AuthenticatedRequest;
   const { url, customShortCode, expiresAt } = req.body;
-  if (!req.user?.id) {
-    return res
-      .status(httpStatusCodes.UNAUTHORIZED)
-      .json({ message: "User not authenticated" });
-  }
 
   if (customShortCode) {
     // Check if custom short code is already in use
@@ -29,9 +28,11 @@ export const createShortUrl: RequestHandler = async (req, res) => {
         long_url: url,
         short_url: customShortCode,
         expires_at: expiresAt,
-        user_id: req.user.id,
+        user_id: user.id,
       },
     });
+
+    await redis.del(redisKeys.allUrls(user.id));
 
     return res.status(httpStatusCodes.CREATED).json({
       success: true,
@@ -49,9 +50,11 @@ export const createShortUrl: RequestHandler = async (req, res) => {
       long_url: url,
       short_url: newUnqiueShortCode,
       expires_at: expiresAt,
-      user_id: req.user.id,
+      user_id: user.id,
     },
   });
+
+  await redis.del(redisKeys.allUrls(user.id));
 
   return res.status(httpStatusCodes.CREATED).json({
     success: true,
@@ -59,14 +62,33 @@ export const createShortUrl: RequestHandler = async (req, res) => {
     shortUrl: `${config.BASE_URL}/${newUrl.short_url}`,
     expiresAt: newUrl.expires_at,
   });
-};
+});
 
 export const redirectToOriginalUrl: RequestHandler = async (req, res) => {
   const { shortCode } = req.params;
+  const cacheKey = redisKeys.url(shortCode as string);
 
-  const urlEntry = await prisma.url.findUnique({
-    where: { short_url: shortCode as string },
-  });
+  // Check cache first
+  const cached = await redis.get(cacheKey);
+  let urlEntry = null;
+
+  if (cached) {
+    urlEntry = JSON.parse(cached);
+  } else {
+    // Cache miss - fetch DB
+    urlEntry = await prisma.url.findUnique({
+      where: { short_url: shortCode as string },
+    });
+
+    if (urlEntry) {
+      // Cache the result
+      await redis.setex(
+        cacheKey,
+        CACHE_TTL.SHORT_CODE_REDIRECT,
+        JSON.stringify(urlEntry),
+      );
+    }
+  }
 
   if (!urlEntry) {
     return res
@@ -75,8 +97,9 @@ export const redirectToOriginalUrl: RequestHandler = async (req, res) => {
   }
 
   if (urlEntry.expires_at && urlEntry.expires_at < new Date()) {
+    await redis.del(cacheKey);
     return res
-      .status(httpStatusCodes.GONE)
+      .status(httpStatusCodes.FORBIDDEN)
       .json({ message: "Short URL has expired" });
   }
 
@@ -95,11 +118,28 @@ export const redirectToOriginalUrl: RequestHandler = async (req, res) => {
 
 export const getUrlByShortCode: RequestHandler = async (req, res) => {
   const { shortCode } = req.params;
+  const cacheKey = redisKeys.url(shortCode as string);
 
-  const urlEntry = await prisma.url.findUnique({
-    where: { short_url: shortCode as string },
-    include: { users: { select: { id: true, email: true, name: true } } },
-  });
+  // Check cache first
+  const cached = await redis.get(cacheKey);
+  let urlEntry = null;
+
+  if (cached) {
+    urlEntry = JSON.parse(cached);
+  } else {
+    urlEntry = await prisma.url.findUnique({
+      where: { short_url: shortCode as string },
+      include: { users: { select: { id: true, email: true, name: true } } },
+    });
+
+    if (urlEntry) {
+      await redis.setex(
+        cacheKey,
+        CACHE_TTL.URL_DETAILS,
+        JSON.stringify(urlEntry),
+      );
+    }
+  }
 
   if (!urlEntry) {
     return res.status(404).json({ message: "Short URL not found" });
@@ -122,16 +162,30 @@ export const getUrlByShortCode: RequestHandler = async (req, res) => {
   });
 };
 
-export const getAllUrls: RequestHandler = async (req, res) => {
-  if (!req.user?.id) {
-    return res
-      .status(httpStatusCodes.UNAUTHORIZED)
-      .json({ message: "User not authenticated" });
+export const getAllUrls: RequestHandler = asyncHandler(async (req, res) => {
+  const { user } = req as AuthenticatedRequest;
+
+  const cacheKey = redisKeys.allUrls(user.id);
+  const cached = await redis.get(cacheKey);
+
+  if (cached) {
+    return res.status(httpStatusCodes.OK).json({
+      success: true,
+      urls: JSON.parse(cached),
+    });
   }
 
   const urls = await prisma.url.findMany({
-    where: { user_id: req.user.id },
+    where: { user_id: user.id },
   });
+
+  if (!urls || urls.length === 0) {
+    return res.status(httpStatusCodes.OK).json({
+      success: true,
+      message: "No URLs found",
+      urls: [],
+    });
+  }
 
   const formattedUrls = urls.map((url) => ({
     id: url.id,
@@ -141,13 +195,21 @@ export const getAllUrls: RequestHandler = async (req, res) => {
     createdAt: url.created_at,
   }));
 
+  // Cache the result
+  await redis.setex(
+    cacheKey,
+    CACHE_TTL.USER_URLS,
+    JSON.stringify(formattedUrls),
+  );
+
   return res.status(httpStatusCodes.OK).json({
     success: true,
     urls: formattedUrls,
   });
-};
+});
 
-export const updateUrl: RequestHandler = async (req, res) => {
+export const updateUrl: RequestHandler = asyncHandler(async (req, res) => {
+  const { user } = req as AuthenticatedRequest;
   const { shortCode } = req.params;
   const { long_url, expires_at } = req.body;
 
@@ -161,7 +223,7 @@ export const updateUrl: RequestHandler = async (req, res) => {
       .json({ message: "Short URL not found" });
   }
 
-  if (url.user_id !== req.user?.id) {
+  if (url.user_id !== user.id) {
     return res.status(httpStatusCodes.FORBIDDEN).json({
       message: "Forbidden: You do not have permission to update this URL",
     });
@@ -175,6 +237,9 @@ export const updateUrl: RequestHandler = async (req, res) => {
     },
   });
 
+  await redis.del(redisKeys.url(shortCode as string));
+  await redis.del(redisKeys.allUrls(user.id));
+
   return res.status(httpStatusCodes.OK).json({
     success: true,
     message: "Short URL updated successfully",
@@ -186,9 +251,10 @@ export const updateUrl: RequestHandler = async (req, res) => {
       createdAt: updatedUrl.created_at,
     },
   });
-};
+});
 
-export const deleteUrl: RequestHandler = async (req, res) => {
+export const deleteUrl: RequestHandler = asyncHandler(async (req, res) => {
+  const { user } = req as AuthenticatedRequest;
   const { shortCode } = req.params;
 
   const url = await prisma.url.findUnique({
@@ -201,7 +267,7 @@ export const deleteUrl: RequestHandler = async (req, res) => {
       .json({ message: "Short URL not found" });
   }
 
-  if (url.user_id !== req.user?.id) {
+  if (url.user_id !== user.id) {
     return res.status(httpStatusCodes.FORBIDDEN).json({
       message: "Forbidden: You do not have permission to delete this URL",
     });
@@ -211,44 +277,76 @@ export const deleteUrl: RequestHandler = async (req, res) => {
     where: { short_url: shortCode as string },
   });
 
+  await redis.del(redisKeys.url(shortCode as string));
+  await redis.del(redisKeys.allUrls(user.id));
+
   return res.status(httpStatusCodes.OK).json({
     success: true,
     message: "Short URL deleted successfully",
   });
-};
+});
 
-export const getUrlAnalytics: RequestHandler = async (req, res) => {
-  const { shortCode } = req.params;
+export const getUrlAnalytics: RequestHandler = asyncHandler(
+  async (req, res) => {
+    const { user } = req as AuthenticatedRequest;
+    const { shortCode } = req.params;
 
-  const url = await prisma.url.findUnique({
-    where: { short_url: shortCode as string },
-  });
-
-  if (!url) {
-    return res
-      .status(httpStatusCodes.NOT_FOUND)
-      .json({ message: "Short URL not found" });
-  }
-
-  if (url.user_id !== req.user?.id) {
-    return res.status(httpStatusCodes.FORBIDDEN).json({
-      message:
-        "Forbidden: You do not have permission to view analytics for this URL",
+    const url = await prisma.url.findUnique({
+      where: { short_url: shortCode as string },
     });
-  }
 
-  const analytics = await prisma.analytics.findMany({
-    where: { url_id: url.id },
-    orderBy: { click_at: "desc" },
-  });
+    if (!url) {
+      return res
+        .status(httpStatusCodes.NOT_FOUND)
+        .json({ message: "Short URL not found" });
+    }
 
-  return res.status(httpStatusCodes.OK).json({
-    success: true,
-    analytics: analytics.map((entry) => ({
+    if (url.user_id !== user.id) {
+      return res.status(httpStatusCodes.FORBIDDEN).json({
+        message:
+          "Forbidden: You do not have permission to view analytics for this URL",
+      });
+    }
+
+    const cacheKey = redisKeys.analytics(shortCode as string);
+    const cached = await redis.get(cacheKey);
+
+    if (cached) {
+      return res.status(httpStatusCodes.OK).json({
+        success: true,
+        analytics: JSON.parse(cached),
+      });
+    }
+
+    const analytics = await prisma.analytics.findMany({
+      where: { url_id: url.id },
+      orderBy: { click_at: "desc" },
+    });
+
+    if (!analytics || analytics.length === 0) {
+      return res.status(httpStatusCodes.NOT_FOUND).json({
+        success: false,
+        message: "No analytics found for this URL",
+      });
+    }
+
+    const formattedAnalytics = analytics.map((entry) => ({
       clickAt: entry.click_at,
       ipAddress: entry.ip_address,
       userAgent: entry.user_agent,
       referrer: entry.referrer,
-    })),
-  });
-};
+    }));
+
+    // Cache the analytics data
+    await redis.setex(
+      cacheKey,
+      CACHE_TTL.ANALYTICS,
+      JSON.stringify(formattedAnalytics),
+    );
+
+    return res.status(httpStatusCodes.OK).json({
+      success: true,
+      analytics: formattedAnalytics,
+    });
+  },
+);
