@@ -36,6 +36,6 @@ model Analytics {
   user_agent String?
   ip_address String?
   referrer   String?
-  url_id     Int      @unique
+  url_id     Int
   url        Url      @relation(fields: [url_id], references: [id])
 }
