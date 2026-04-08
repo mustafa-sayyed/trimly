@@ -5,7 +5,6 @@ import {
   getAllUrls,
   getUrlAnalytics,
   getUrlByShortCode,
-  redirectToOriginalUrl,
   updateUrl,
 } from "../controllers/url.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -27,6 +26,7 @@ router.post(
 router.get("/", verifyJWT, getAllUrls);
 router.get(
   "/code/:shortCode",
+  verifyJWT,
   validateRequest({ params: shortCodeParamSchema }),
   getUrlByShortCode,
 );
@@ -47,11 +47,6 @@ router.get(
   verifyJWT,
   validateRequest({ params: shortCodeParamSchema }),
   getUrlAnalytics,
-);
-router.get(
-  "/r/:shortCode",
-  validateRequest({ params: shortCodeParamSchema }),
-  redirectToOriginalUrl,
 );
 
 export default router;

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
-import { flattenError, treeifyError, type ZodError, type ZodType } from "zod";
+import { flattenError, type ZodError, type ZodType } from "zod";
 
 type ValidationSchemas = {
   body?: ZodType;
@@ -10,13 +10,7 @@ type ValidationSchemas = {
 const formatErrors = (error: ZodError) => {
   console.log(error);
 
-  return error.issues.map((issue) => ({
-    field:
-      issue.path.length > 0
-        ? issue.path.map((segment) => String(segment)).join(".")
-        : "request",
-    message: issue.message,
-  }));
+  return flattenError(error).fieldErrors;
 };
 
 const validateAgainstSchema = (schema: ZodType | undefined, input: unknown) => {
@@ -33,18 +27,18 @@ export const validateRequest = (schemas: ValidationSchemas): RequestHandler => {
     const paramsResult = validateAgainstSchema(schemas.params, req.params);
     const queryResult = validateAgainstSchema(schemas.query, req.query);
 
-    const errors: Array<{ field: string; message: string }> = [];
+    const errors = [];
 
     if (!bodyResult.success) {
-      errors.push(...formatErrors(bodyResult.error));
+      errors.push(formatErrors(bodyResult.error));
     }
 
     if (!paramsResult.success) {
-      errors.push(...formatErrors(paramsResult.error));
+      errors.push(formatErrors(paramsResult.error));
     }
 
     if (!queryResult.success) {
-      errors.push(...formatErrors(queryResult.error));
+      errors.push(formatErrors(queryResult.error));
     }
 
     if (errors.length > 0) {

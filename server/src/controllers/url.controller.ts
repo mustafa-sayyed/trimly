@@ -6,6 +6,7 @@ import { generateUniqueShortCode } from "../utils/uniqueShortCode.util.js";
 import httpStatusCodes from "../utils/httpStatusCodes.util.js";
 import type { AuthenticatedRequest } from "../types.js";
 import { redis, redisKeys, CACHE_TTL } from "../utils/redis.util.js";
+import { UAParser } from "ua-parser-js";
 
 export const createShortUrl: RequestHandler = asyncHandler(async (req, res) => {
   const { user } = req as AuthenticatedRequest;
@@ -103,12 +104,14 @@ export const redirectToOriginalUrl: RequestHandler = async (req, res) => {
       .json({ message: "Short URL has expired" });
   }
 
-  prisma.analytics.create({
+  const parsedUserAgent = UAParser(req.headers["user-agent"]);
+
+  const result = await prisma.analytics.create({
     data: {
       click_at: new Date(),
       url_id: urlEntry.id,
       ip_address: req.ip || null,
-      user_agent: req.headers["user-agent"] || null,
+      user_agent: parsedUserAgent.browser.name || null,
       referrer: req.get("Referrer") || null,
     },
   });
@@ -129,7 +132,6 @@ export const getUrlByShortCode: RequestHandler = async (req, res) => {
   } else {
     urlEntry = await prisma.url.findUnique({
       where: { short_url: shortCode as string },
-      include: { users: { select: { id: true, email: true, name: true } } },
     });
 
     if (urlEntry) {
@@ -153,11 +155,6 @@ export const getUrlByShortCode: RequestHandler = async (req, res) => {
       shortUrl: `${config.BASE_URL}/${urlEntry.short_url}`,
       expiresAt: urlEntry.expires_at,
       createdAt: urlEntry.created_at,
-      user: {
-        id: urlEntry.users.id,
-        email: urlEntry.users.email,
-        name: urlEntry.users.name,
-      },
     },
   });
 };

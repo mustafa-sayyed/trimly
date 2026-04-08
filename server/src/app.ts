@@ -4,6 +4,9 @@ import { config } from "./config/config.js";
 import urlRouter from "./routes/url.route.js";
 import userRouter from "./routes/user.route.js";
 import globalErrorHandler from "./middlewares/errorHandler.middleware.js";
+import { validateRequest } from "./middlewares/validation.middleware.js";
+import { redirectToOriginalUrl } from "./controllers/url.controller.js";
+import { shortCodeParamSchema } from "./validations/url.validation.js";
 
 const app = express();
 
@@ -14,6 +17,11 @@ app.use(express.json());
 // Routes
 app.use("/api/v1/urls", urlRouter);
 app.use("/api/v1/users", userRouter);
+app.get(
+  "/:shortCode",
+  validateRequest({ params: shortCodeParamSchema }),
+  redirectToOriginalUrl,
+);
 
 // Health Check
 app.get("/health", (req, res) => {

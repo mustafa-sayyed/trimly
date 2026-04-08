@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import { config } from "../config/config.js";
-import type { TokenPayload } from "../types.js";
+import type { TokenPayload, TokenPayload } from "../types.js";
 
 // Type fix for JWT expiresIn option when signing the payload
 // type TokenExpiry = NonNullable<jwt.SignOptions["expiresIn"]>;
@@ -38,4 +38,12 @@ export const verifyRefreshToken = (token: string): TokenPayload | null => {
   } catch (error) {
     return null;
   }
+};
+
+export const getPayload = (payload: TokenPayload): TokenPayload => {
+  return {
+    id: payload.id,
+    name: payload.name,
+    email: payload.email,
+  };
 };

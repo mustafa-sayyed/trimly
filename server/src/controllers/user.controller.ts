@@ -7,6 +7,7 @@ import { comparePassword, hashPassword } from "../utils/password.util.js";
 import {
   generateAccessToken,
   generateRefreshToken,
+  getPayload,
   verifyRefreshToken,
 } from "../utils/jwt.util.js";
 import type { AuthenticatedRequest } from "../types.js";
@@ -192,9 +193,10 @@ export const getNewAccessToken: RequestHandler = asyncHandler(
         "Invalid or expired refresh token",
       );
     }
+    console.log("[Payload]: ", payload);
 
-    const newAccessToken = generateAccessToken(payload);
-    const newRefreshToken = generateRefreshToken(payload);
+    const newAccessToken = generateAccessToken(getPayload(payload));
+    const newRefreshToken = generateRefreshToken(getPayload(payload));
 
     await prisma.user.update({
       where: { id: user.id },
