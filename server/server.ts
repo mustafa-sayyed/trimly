@@ -19,11 +19,15 @@ prisma
     });
   })
   .catch(async (err) => {
-    console.error("Failed to connect to the database:", err);
+    console.error("Failed to start Server:", err);
     await prisma.$disconnect();
     await redis.quit();
     process.exit(1);
   });
+
+redis.on("error", (error) => {
+  console.log("Redis Error: ", error);
+})
 
 process.on("SIGINT", async () => {
   console.log("Gracefully shutting down...");

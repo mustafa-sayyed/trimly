@@ -1,25 +1,25 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
-import type { ZodError, ZodTypeAny } from "zod";
+import { flattenError, treeifyError, type ZodError, type ZodType } from "zod";
 
 type ValidationSchemas = {
-  body?: ZodTypeAny;
-  params?: ZodTypeAny;
-  query?: ZodTypeAny;
+  body?: ZodType;
+  params?: ZodType;
+  query?: ZodType;
 };
 
-const formatErrors = (error: ZodError) =>
-  error.issues.map((issue) => ({
+const formatErrors = (error: ZodError) => {
+  console.log(error);
+
+  return error.issues.map((issue) => ({
     field:
       issue.path.length > 0
         ? issue.path.map((segment) => String(segment)).join(".")
         : "request",
     message: issue.message,
   }));
+};
 
-const validateAgainstSchema = (
-  schema: ZodTypeAny | undefined,
-  input: unknown,
-) => {
+const validateAgainstSchema = (schema: ZodType | undefined, input: unknown) => {
   if (!schema) {
     return { success: true as const, data: input };
   }
@@ -50,6 +50,7 @@ export const validateRequest = (schemas: ValidationSchemas): RequestHandler => {
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
+        name: "ValidationError",
         message: "Validation failed",
         errors,
       });
