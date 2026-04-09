@@ -1,5 +1,6 @@
 import { Redis } from "ioredis";
 import { config } from "../config/config.js";
+import { logger } from "./winston.js";
 
 const redis = new Redis({
   host: config.REDIS_HOST,
@@ -12,6 +13,10 @@ const redis = new Redis({
     const delay = Math.min(times * 100, 2000);
     return delay;
   },
+});
+
+redis.on("error", (error) => {
+  logger.error("Redis error", { error });
 });
 
 const key = (...args: Array<string | number>) => {

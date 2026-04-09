@@ -2,43 +2,60 @@ import "dotenv/config";
 import app from "./src/app.js";
 import { prisma } from "./src/db/index.js";
 import { redis } from "./src/utils/redis.util.js";
+import { logger } from "./src/utils/winston.js";
 
 const PORT = process.env.PORT || 5000;
+
+const closeConnections = async () => {
+  await prisma.$disconnect().catch((error) => {
+    logger.error("Failed to disconnect prisma", { error });
+  });
+
+  if (redis.status !== "end") {
+    await redis.quit().catch((error) => {
+      logger.warn("Redis quit failed, forcing redis to disconnect", {
+        error,
+        redisStatus: redis.status,
+      });
+      redis.disconnect();
+    });
+  }
+};
 
 prisma
   .$connect()
   .then(async () => {
-    console.log(`Database connected successfully`);
-    
+    await prisma.$queryRaw`SELECT 1`.catch((error) => {
+      logger.error("Database connection test failed", { error });
+      logger.error("Database connection failed", { error });
+      throw error;
+    }).then(() => {
+      logger.info("Database connection test successful");
+      logger.info("Database connected successfully");
+    });
+
     await redis.connect();
     const pong = await redis.ping();
-    console.log("Redis connection successful:", pong);
+    logger.info("Redis connection successful", { pong });
 
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      logger.info("Server is running", { port: PORT });
     });
   })
   .catch(async (err) => {
-    console.error("Failed to start Server:", err);
-    await prisma.$disconnect();
-    await redis.quit();
+    logger.error("Failed to start server", { error: err });
+    await closeConnections();
     process.exit(1);
   });
 
-redis.on("error", (error) => {
-  console.log("Redis Error: ", error);
-})
-
 process.on("SIGINT", async () => {
-  console.log("Gracefully shutting down...");
-  await prisma.$disconnect();
-  await redis.quit();
+  logger.info("Gracefully shutting down", { signal: "SIGINT" });
+  await closeConnections();
   process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
-  console.log("Gracefully shutting down...");
-  await prisma.$disconnect();
-  await redis.quit();
+  logger.info("Gracefully shutting down", { signal: "SIGTERM" });
+  await closeConnections();
   process.exit(0);
 });

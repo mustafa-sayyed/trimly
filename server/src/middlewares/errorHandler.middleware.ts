@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { config } from "../config/config.js";
 import type { ApiError } from "../types.js";
+import { logger } from "../utils/winston.js";
 
 const globalErrorHandler = (
   err: ApiError,
@@ -8,7 +9,10 @@ const globalErrorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  console.log(err);
+  logger.error(err.message, {
+    statusCode: err.statusCode,
+    stack: err.stack,
+  });
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
   const error = config.NODE_ENV === "development" ? err : undefined;

@@ -7,6 +7,8 @@ import globalErrorHandler from "./middlewares/errorHandler.middleware.js";
 import { validateRequest } from "./middlewares/validation.middleware.js";
 import { redirectToOriginalUrl } from "./controllers/url.controller.js";
 import { shortCodeParamSchema } from "./validations/url.validation.js";
+import "./utils/sentry.js";
+import * as Sentry from "@sentry/node";
 
 const app = express();
 
@@ -27,6 +29,9 @@ app.get(
 app.get("/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is healthy..." });
 });
+
+// Sentry Error Handler
+Sentry.setupExpressErrorHandler(app);
 
 // Global Error Handler
 app.use(globalErrorHandler);

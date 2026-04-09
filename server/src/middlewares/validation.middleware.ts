@@ -1,5 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { flattenError, type ZodError, type ZodType } from "zod";
+import { logger } from "../utils/winston.js";
 
 type ValidationSchemas = {
   body?: ZodType;
@@ -8,7 +9,13 @@ type ValidationSchemas = {
 };
 
 const formatErrors = (error: ZodError) => {
-  console.log(error);
+  logger.warn("Request validation failed", {
+    issues: error.issues.map((issue) => ({
+      path: issue.path.join("."),
+      message: issue.message,
+      code: issue.code,
+    })),
+  });
 
   return flattenError(error).fieldErrors;
 };

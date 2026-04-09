@@ -12,6 +12,7 @@ const _config = {
   REDIS_HOST: process.env.REDIS_HOST!,
   REDIS_PORT: Number(process.env.REDIS_PORT),
   REDIS_DB: Number(process.env.REDIS_DB),
+  SENTRY_DSN: process.env.SENTRY_DSN!,
 };
 
 export const config = Object.freeze(_config);

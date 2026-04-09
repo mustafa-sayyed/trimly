@@ -193,7 +193,6 @@ export const getNewAccessToken: RequestHandler = asyncHandler(
         "Invalid or expired refresh token",
       );
     }
-    console.log("[Payload]: ", payload);
 
     const newAccessToken = generateAccessToken(getPayload(payload));
     const newRefreshToken = generateRefreshToken(getPayload(payload));
