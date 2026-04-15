@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { config } from "../config/config.js";
 import type { ApiError } from "../types.js";
-import { logger } from "../utils/winston.js";
+import { logger } from "../services/winston.js";
 
 const globalErrorHandler = (
   err: ApiError,

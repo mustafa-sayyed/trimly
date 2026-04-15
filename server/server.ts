@@ -1,8 +1,8 @@
 import "dotenv/config";
 import app from "./src/app.js";
 import { prisma } from "./src/db/index.js";
-import { redis } from "./src/utils/redis.util.js";
-import { logger } from "./src/utils/winston.js";
+import { redis } from "./src/services/redis.js";
+import { logger } from "./src/services/winston.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -36,7 +36,7 @@ prisma
 
     await redis.connect();
     const pong = await redis.ping();
-    logger.info("Redis connection successful", { pong });
+    logger.info("Redis connection successful", { pong, redisStatus: redis.status });
 
     app.listen(PORT, () => {
       logger.info("Server is running", { port: PORT });

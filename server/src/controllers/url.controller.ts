@@ -5,8 +5,9 @@ import asyncHandler from "../utils/asyncHandler.util.js";
 import { generateUniqueShortCode } from "../utils/uniqueShortCode.util.js";
 import httpStatusCodes from "../utils/httpStatusCodes.util.js";
 import type { AuthenticatedRequest } from "../types.js";
-import { redis, redisKeys, CACHE_TTL } from "../utils/redis.util.js";
+import { redis, redisKeys, CACHE_TTL } from "../services/redis.js";
 import { UAParser } from "ua-parser-js";
+import { getAnalyticsQueue } from "../services/bullmq.js";
 
 export const createShortUrl: RequestHandler = asyncHandler(async (req, res) => {
   const { user } = req as AuthenticatedRequest;
@@ -106,7 +107,8 @@ export const redirectToOriginalUrl: RequestHandler = async (req, res) => {
 
   const parsedUserAgent = UAParser(req.headers["user-agent"]);
 
-  const result = await prisma.analytics.create({
+  const analyticsQueue = getAnalyticsQueue();
+  await analyticsQueue.add(`Add Analytics for ${urlEntry.long_url}`, {
     data: {
       click_at: new Date(),
       url_id: urlEntry.id,

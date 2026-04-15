@@ -11,7 +11,7 @@ import {
   verifyRefreshToken,
 } from "../utils/jwt.util.js";
 import type { AuthenticatedRequest } from "../types.js";
-import { CACHE_TTL, redis, redisKeys } from "../utils/redis.util.js";
+import { CACHE_TTL, redis, redisKeys } from "../services/redis.js";
 
 export const registerUser: RequestHandler = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;

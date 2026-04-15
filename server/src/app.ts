@@ -7,7 +7,7 @@ import globalErrorHandler from "./middlewares/errorHandler.middleware.js";
 import { validateRequest } from "./middlewares/validation.middleware.js";
 import { redirectToOriginalUrl } from "./controllers/url.controller.js";
 import { shortCodeParamSchema } from "./validations/url.validation.js";
-import "./utils/sentry.js";
+import "./services/sentry.js";
 import * as Sentry from "@sentry/node";
 
 const app = express();
@@ -26,7 +26,7 @@ app.get(
 );
 
 // Health Check
-app.get("/health", (req, res) => {
+app.get("/api/v1/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is healthy..." });
 });
 

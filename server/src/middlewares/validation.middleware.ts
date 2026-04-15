@@ -1,6 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { flattenError, type ZodError, type ZodType } from "zod";
-import { logger } from "../utils/winston.js";
+import { logger } from "../services/winston.js";
 
 type ValidationSchemas = {
   body?: ZodType;
