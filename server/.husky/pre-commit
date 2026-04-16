@@ -1,5 +1,0 @@
-cd server
-pnpm format
-git add -A .
-
-echo -e "\033[1;32mCode Formatted and added to Git Successfully.\033[0m"
