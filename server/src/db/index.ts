@@ -1,9 +1,4 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../../generated/prisma/client.js";
-import { config } from "../config/config.js";
+import { prisma } from "@packages/db";
 
-const adapter = new PrismaPg({ connectionString: config.DATABASE_URL });
-
-const prisma = new PrismaClient({ adapter });
-
+// Instead of changing imports, re exporting prisma here, to maintain compatibility with existing code.
 export { prisma };
