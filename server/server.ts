@@ -7,12 +7,12 @@ import { logger } from "./src/services/winston.js";
 const PORT = process.env.PORT || 5000;
 
 const closeConnections = async () => {
-  await prisma.$disconnect().catch((error) => {
+  await prisma.$disconnect().catch((error: unknown) => {
     logger.error("Failed to disconnect prisma", { error });
   });
 
   if (redis.status !== "end") {
-    await redis.quit().catch((error) => {
+    await redis.quit().catch((error: unknown) => {
       logger.warn("Redis quit failed, forcing redis to disconnect", {
         error,
         redisStatus: redis.status,
@@ -25,24 +25,29 @@ const closeConnections = async () => {
 prisma
   .$connect()
   .then(async () => {
-    await prisma.$queryRaw`SELECT 1`.catch((error) => {
-      logger.error("Database connection test failed", { error });
-      logger.error("Database connection failed", { error });
-      throw error;
-    }).then(() => {
-      logger.info("Database connection test successful");
-      logger.info("Database connected successfully");
-    });
+    await prisma.$queryRaw`SELECT 1`
+      .catch((error: unknown) => {
+        logger.error("Database connection test failed", { error });
+        logger.error("Database connection failed", { error });
+        throw error;
+      })
+      .then(() => {
+        logger.info("Database connection test successful");
+        logger.info("Database connected successfully");
+      });
 
     await redis.connect();
     const pong = await redis.ping();
-    logger.info("Redis connection successful", { pong, redisStatus: redis.status });
+    logger.info("Redis connection successful", {
+      pong,
+      redisStatus: redis.status,
+    });
 
     app.listen(PORT, () => {
       logger.info("Server is running", { port: PORT });
     });
   })
-  .catch(async (err) => {
+  .catch(async (err: unknown) => {
     logger.error("Failed to start server", { error: err });
     await closeConnections();
     process.exit(1);

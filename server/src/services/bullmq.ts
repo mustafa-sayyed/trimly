@@ -1,22 +1,11 @@
-import { Queue } from "bullmq";
+import { getAnalyticsQueue as createAnalyticsQueue } from "@packages/queue";
 import { redis } from "./redis.js";
 import { logger } from "./winston.js";
 
 const getAnalyticsQueue = () => {
-  const analyticsQueue = new Queue("Analytics Queue", {
-    connection: {
-      ...redis,
-      lazyConnect: true,
-    },
-    defaultJobOptions: {
-      backoff: {
-        type: "exponential",
-        delay: 2000,
-      },
-    },
-  });
+  const analyticsQueue = createAnalyticsQueue(redis);
 
-  analyticsQueue.on("error", (err) => {
+  analyticsQueue.on("error", (err: unknown) => {
     logger.error("BullMQ Queue error: ", { error: err });
   });
 
