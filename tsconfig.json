@@ -2,7 +2,10 @@
   "compilerOptions": {
     "strict": true,
     "module": "nodenext",
+    "moduleResolution": "nodenext",
     "target": "esnext",
+    "lib": ["esnext"],
+    "types": ["node"],
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "jsx": "react-jsx",
@@ -10,8 +13,7 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
-    "noEmit": true
+    "skipLibCheck": true
   },
   "exclude": ["**/dist", "**/node_modules"]
 }
