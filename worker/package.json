@@ -23,6 +23,7 @@
   },
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
-    "@packages/db": "workspace:*"
+    "@packages/db": "workspace:*",
+    "@packages/queue": "workspace:*"
   }
 }

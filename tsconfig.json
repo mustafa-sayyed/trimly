@@ -16,5 +16,5 @@
     "skipLibCheck": true,
     "useUnknownInCatchVariables": true
   },
-  "exclude": ["**/dist", "**/node_modules"]
+  "exclude": ["node_modules", "dist", "**/dist", "**/node_modules"]
 }
