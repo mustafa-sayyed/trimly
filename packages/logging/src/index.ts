@@ -1,4 +1,5 @@
 import winston, { format } from "winston";
+import { getLoggingConfig } from "@packages/config";
 
 const { combine, timestamp, json, colorize, printf, errors } = format;
 
@@ -32,16 +33,13 @@ const createConsoleFormat = (isDevelopment: boolean) => {
 };
 
 export interface LoggerOptions {
-  isDevelopment: boolean;
   level?: string;
   transports: winston.transport[];
 }
 
-export const createLogger = ({
-  isDevelopment,
-  level,
-  transports,
-}: LoggerOptions) => {
+export const createLogger = ({ level, transports }: LoggerOptions) => {
+  const { isDevelopment } = getLoggingConfig();
+
   return winston.createLogger({
     level: level ?? (isDevelopment ? "debug" : "info"),
     format: createConsoleFormat(isDevelopment),

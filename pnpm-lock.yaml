@@ -94,8 +94,24 @@ importers:
         specifier: ^8.0.1
         version: 8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
 
+  packages/config:
+    dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/db:
     dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../config
       '@prisma/adapter-pg':
         specifier: ^7.7.0
         version: 7.7.0
@@ -124,6 +140,9 @@ importers:
 
   packages/logging:
     dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../config
       winston:
         specifier: ^3.19.0
         version: 3.19.0
@@ -137,6 +156,9 @@ importers:
 
   packages/queue:
     dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../config
       '@packages/logging':
         specifier: workspace:*
         version: link:../logging
@@ -156,6 +178,9 @@ importers:
 
   server:
     dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../packages/config
       '@packages/db':
         specifier: workspace:*
         version: link:../packages/db

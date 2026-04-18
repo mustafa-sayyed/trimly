@@ -1,4 +1,7 @@
-import { prisma } from "@packages/db";
+import { createPrisma } from "@packages/db";
+import { config } from "../config/config.js";
 
-// Instead of changing imports, re exporting prisma here, to maintain compatibility with existing code.
+// Keep the singleton in the server layer so env/config loading stays here.
+const prisma = createPrisma(config.DATABASE_URL);
+
 export { prisma };

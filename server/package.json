@@ -19,6 +19,7 @@
   "packageManager": "pnpm@10.22.0",
   "dependencies": {
     "@packages/db": "workspace:*",
+    "@packages/config": "workspace:*",
     "@packages/logging": "workspace:*",
     "@packages/queue": "workspace:*",
     "@sentry/node": "^10.47.0",

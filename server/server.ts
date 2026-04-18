@@ -1,10 +1,11 @@
 import "dotenv/config";
 import app from "./src/app.js";
 import { prisma } from "./src/db/index.js";
+import { config } from "./src/config/config.js";
 import { redis } from "./src/services/redis.js";
 import { logger } from "./src/services/winston.js";
 
-const PORT = process.env.PORT || 5000;
+const PORT = config.PORT;
 
 const closeConnections = async () => {
   await prisma.$disconnect().catch((error: unknown) => {
