@@ -14,7 +14,9 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
   "exclude": ["node_modules", "dist", "**/dist", "**/node_modules"]
 }

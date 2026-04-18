@@ -1,15 +1,10 @@
 import { Queue } from "bullmq";
-import type { RedisConfig } from "./redis.js";
+import type { Redis } from "ioredis";
+export function getAnalyticsQueue(redis: Redis) {
+  const connection = redis;
 
-export const getAnalyticsQueue = (redisConfig: RedisConfig) => {
   const analyticsQueue = new Queue("Analytics Queue", {
-    connection: {
-      host: redisConfig.host,
-      port: redisConfig.port,
-      password: redisConfig.password,
-      db: redisConfig.db ?? 0,
-      lazyConnect: true,
-    },
+    connection,
     defaultJobOptions: {
       backoff: {
         type: "exponential",
@@ -27,4 +22,4 @@ export const getAnalyticsQueue = (redisConfig: RedisConfig) => {
   });
 
   return analyticsQueue;
-};
+}
