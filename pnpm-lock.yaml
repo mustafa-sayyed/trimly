@@ -137,6 +137,9 @@ importers:
 
   packages/queue:
     dependencies:
+      '@packages/logging':
+        specifier: workspace:*
+        version: link:../logging
       bullmq:
         specifier: ^5.73.5
         version: 5.74.1

@@ -1,5 +1,6 @@
 import { Queue } from "bullmq";
 import type { Redis } from "ioredis";
+import { logger } from "./logger.js";
 export function getAnalyticsQueue(redis: Redis) {
   const connection = redis;
 
@@ -14,11 +15,11 @@ export function getAnalyticsQueue(redis: Redis) {
   });
 
   analyticsQueue.on("error", (err) => {
-    console.error("BullMQ Queue error: ", err);
+    logger.error("BullMQ Queue error", { error: err });
   });
 
   analyticsQueue.on("ioredis:close", () => {
-    console.error("BullMQ Queue connection closed, ioredis connection closed");
+    logger.error("BullMQ Queue connection closed, ioredis connection closed");
   });
 
   return analyticsQueue;

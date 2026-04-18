@@ -1,4 +1,5 @@
 import { Redis } from "ioredis";
+import { logger } from "./logger.js";
 
 export interface RedisConfig {
   host: string;
@@ -22,7 +23,7 @@ const createRedisClient = (config: RedisConfig) => {
   });
 
   redis.on("error", (error) => {
-    console.error("Redis error", error);
+    logger.error("Redis error", { error });
   });
 
   return redis;
