@@ -19,6 +19,7 @@
   "packageManager": "pnpm@10.22.0",
   "dependencies": {
     "@packages/db": "workspace:*",
+    "@packages/logging": "workspace:*",
     "@packages/queue": "workspace:*",
     "@sentry/node": "^10.47.0",
     "bcrypt": "^6.0.0",
@@ -27,7 +28,6 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "ua-parser-js": "^2.0.9",
-    "winston": "^3.19.0",
     "winston-transport": "^4.9.0",
     "zod": "^4.3.6"
   },

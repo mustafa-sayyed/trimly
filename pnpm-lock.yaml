@@ -122,6 +122,19 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/logging:
+    dependencies:
+      winston:
+        specifier: ^3.19.0
+        version: 3.19.0
+    devDependencies:
+      '@types/node':
+        specifier: ^25.5.0
+        version: 25.6.0
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+
   packages/queue:
     dependencies:
       bullmq:
@@ -143,6 +156,9 @@ importers:
       '@packages/db':
         specifier: workspace:*
         version: link:../packages/db
+      '@packages/logging':
+        specifier: workspace:*
+        version: link:../packages/logging
       '@packages/queue':
         specifier: workspace:*
         version: link:../packages/queue
@@ -167,9 +183,6 @@ importers:
       ua-parser-js:
         specifier: ^2.0.9
         version: 2.0.9
-      winston:
-        specifier: ^3.19.0
-        version: 3.19.0
       winston-transport:
         specifier: ^4.9.0
         version: 4.9.0
