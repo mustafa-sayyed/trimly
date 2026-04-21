@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { is } from "zod/locales";
 
 const nodeEnvSchema = z.enum(["development", "production"]);
 
@@ -35,6 +34,7 @@ const serverEnvSchema = z.object({
 
 const workerEnvSchema = z.object({
   PORT: z.coerce.number().default(5001),
+  SENTRY_DSN: z.string().min(1).optional(),
   ...databaseEnvSchema.shape,
   ...redisEnvSchema.shape,
   ...loggingEnvSchema.shape,

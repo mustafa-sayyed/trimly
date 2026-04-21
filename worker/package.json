@@ -25,6 +25,10 @@
   "dependencies": {
     "@packages/config": "workspace:*",
     "@packages/db": "workspace:*",
-    "@packages/queue": "workspace:*"
+    "@packages/logging": "workspace:*",
+    "@packages/queue": "workspace:*",
+    "@sentry/node": "^10.49.0",
+    "dotenv": "^17.4.2",
+    "winston-transport": "^4.9.0"
   }
 }

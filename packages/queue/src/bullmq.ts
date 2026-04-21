@@ -1,10 +1,13 @@
-import { Queue, Worker } from "bullmq";
+import { Queue, Worker, type Processor, type WorkerOptions } from "bullmq";
 import type { Redis } from "ioredis";
 import { logger } from "./logger.js";
+
+const QUEUE_NAME = "Analytics Queue";
+
 export function getAnalyticsQueue(redis: Redis) {
   const connection = redis;
 
-  const analyticsQueue = new Queue("Analytics Queue", {
+  const analyticsQueue = new Queue(QUEUE_NAME, {
     connection,
     defaultJobOptions: {
       backoff: {
@@ -25,10 +28,19 @@ export function getAnalyticsQueue(redis: Redis) {
   return analyticsQueue;
 }
 
-// const getAnalyticsWorker = () => {
-//   const analyticsWorker = new Worker("Analytics Queue", () => {
+export const createAnalyticsWorker = (
+  processor: Processor,
+  options: WorkerOptions,
+): Worker => {
+  const analyticsWorker = new Worker(QUEUE_NAME, processor, options);
 
-//   }, {
+  analyticsWorker.on("error", (err) => {
+    logger.error("BullMQ Worker error", { error: err });
+  });
 
-//   })
-// }
+  analyticsWorker.on("ioredis:close", () => {
+    logger.error("BullMQ Worker connection closed, ioredis connection closed");
+  });
+
+  return analyticsWorker;
+};

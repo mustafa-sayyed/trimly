@@ -248,9 +248,21 @@ importers:
       '@packages/db':
         specifier: workspace:*
         version: link:../packages/db
+      '@packages/logging':
+        specifier: workspace:*
+        version: link:../packages/logging
       '@packages/queue':
         specifier: workspace:*
         version: link:../packages/queue
+      '@sentry/node':
+        specifier: ^10.49.0
+        version: 10.49.0
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+      winston-transport:
+        specifier: ^4.9.0
+        version: 4.9.0
     devDependencies:
       '@types/node':
         specifier: ^25.5.0
