@@ -23,7 +23,7 @@ prisma
         logger.error("Database connection failed", { error });
         throw error;
       })
-      .then(() => {
+      .then(async () => {
         logger.info("Database connection test successful");
         logger.info("Database connected successfully");
       });

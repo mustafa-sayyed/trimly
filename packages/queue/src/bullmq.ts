@@ -34,13 +34,5 @@ export const createAnalyticsWorker = (
 ): Worker => {
   const analyticsWorker = new Worker(QUEUE_NAME, processor, options);
 
-  analyticsWorker.on("error", (err) => {
-    logger.error("BullMQ Worker error", { error: err });
-  });
-
-  analyticsWorker.on("ioredis:close", () => {
-    logger.error("BullMQ Worker connection closed, ioredis connection closed");
-  });
-
   return analyticsWorker;
 };

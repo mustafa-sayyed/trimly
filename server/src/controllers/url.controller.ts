@@ -109,13 +109,11 @@ export const redirectToOriginalUrl: RequestHandler = async (req, res) => {
 
   const analyticsQueue = getAnalyticsQueue();
   await analyticsQueue.add(`Add Analytics for ${urlEntry.long_url}`, {
-    data: {
-      click_at: new Date(),
-      url_id: urlEntry.id,
-      ip_address: req.ip || null,
-      user_agent: parsedUserAgent.browser.name || null,
-      referrer: req.get("Referrer") || null,
-    },
+    click_at: new Date(),
+    url_id: urlEntry.id,
+    ip_address: req.ip || null,
+    user_agent: parsedUserAgent.browser.name || null,
+    referrer: req.get("Referrer") || null,
   });
 
   return res.status(302).redirect(urlEntry.long_url);
