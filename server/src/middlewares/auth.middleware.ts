@@ -7,6 +7,8 @@ import type { User } from "../types.js";
 /**
  * Extend Express Request to include user data
  */
+
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Express {
     interface Request {

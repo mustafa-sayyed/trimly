@@ -1,6 +1,7 @@
-import jwt, { type JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
 import type { TokenPayload } from "../types.js";
+import { logger } from "@packages/queue";
 
 // Type fix for JWT expiresIn option when signing the payload
 // type TokenExpiry = NonNullable<jwt.SignOptions["expiresIn"]>;
@@ -24,6 +25,7 @@ export const verifyAccessToken = (token: string): TokenPayload | null => {
     const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET) as TokenPayload;
     return decoded;
   } catch (error) {
+    logger.error("Access token verification failed", { error });
     return null;
   }
 };
@@ -36,6 +38,7 @@ export const verifyRefreshToken = (token: string): TokenPayload | null => {
     ) as TokenPayload;
     return decoded;
   } catch (error) {
+    logger.error("Refresh token verification failed", { error });
     return null;
   }
 };

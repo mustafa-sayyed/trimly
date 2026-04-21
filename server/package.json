@@ -9,9 +9,9 @@
     "build": "tsc -b",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "lint": "pnpm exec eslint .",
-    "lint:fix": "pnpm exec eslint . --fix",
-    "format": "pnpm exec prettier --write \"src/**/*.{js,ts,jsx,tsx,css}\""
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,css}\""
   },
   "keywords": [],
   "author": "",

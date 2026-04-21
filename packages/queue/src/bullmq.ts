@@ -1,4 +1,4 @@
-import { Queue } from "bullmq";
+import { Queue, Worker } from "bullmq";
 import type { Redis } from "ioredis";
 import { logger } from "./logger.js";
 export function getAnalyticsQueue(redis: Redis) {
@@ -24,3 +24,11 @@ export function getAnalyticsQueue(redis: Redis) {
 
   return analyticsQueue;
 }
+
+// const getAnalyticsWorker = () => {
+//   const analyticsWorker = new Worker("Analytics Queue", () => {
+
+//   }, {
+
+//   })
+// }

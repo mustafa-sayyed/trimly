@@ -16,7 +16,6 @@ const schema = z
   });
 
 function Register() {
-    
   const {
     register,
     handleSubmit,
@@ -25,16 +24,16 @@ function Register() {
     resolver: zodResolver(schema),
   });
 
-interface RegisterFormData {
+  interface RegisterFormData {
     name: string;
     email: string;
     password: string;
     confirmPassword: string;
-}
+  }
 
-const onSubmit = async (data: RegisterFormData): Promise<void> => {
+  const onSubmit = async (data: RegisterFormData): Promise<void> => {
     console.log("Form Data:", data);
-};
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-amber-400 px-4">
@@ -42,9 +41,7 @@ const onSubmit = async (data: RegisterFormData): Promise<void> => {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm flex flex-col"
       >
-        <h1 className="text-2xl font-bold text-center mb-4">
-          Register
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Register</h1>
 
         <label className="mb-1">Name</label>
         <input
@@ -54,9 +51,7 @@ const onSubmit = async (data: RegisterFormData): Promise<void> => {
           className="mb-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {errors.name && (
-          <p className="text-red-500 text-sm mb-2">
-            {errors.name.message}
-          </p>
+          <p className="text-red-500 text-sm mb-2">{errors.name.message}</p>
         )}
 
         <label className="mb-1">Email</label>
@@ -67,9 +62,7 @@ const onSubmit = async (data: RegisterFormData): Promise<void> => {
           className="mb-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {errors.email && (
-          <p className="text-red-500 text-sm mb-2">
-            {errors.email.message}
-          </p>
+          <p className="text-red-500 text-sm mb-2">{errors.email.message}</p>
         )}
 
         <label className="mb-1">Password</label>
@@ -80,9 +73,7 @@ const onSubmit = async (data: RegisterFormData): Promise<void> => {
           className="mb-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {errors.password && (
-          <p className="text-red-500 text-sm mb-2">
-            {errors.password.message}
-          </p>
+          <p className="text-red-500 text-sm mb-2">{errors.password.message}</p>
         )}
 
         <label className="mb-1">Confirm Password</label>
@@ -121,4 +112,3 @@ const onSubmit = async (data: RegisterFormData): Promise<void> => {
   );
 }
 export default Register;
-

@@ -32,9 +32,7 @@ function Login() {
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm flex flex-col"
       >
-        <h1 className="text-2xl font-bold text-center mb-4">
-          Login
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Login</h1>
 
         <label className="mb-1">Email</label>
         <input
@@ -44,9 +42,7 @@ function Login() {
           className="mb-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {errors.email && (
-          <p className="text-red-500 text-sm mb-2">
-            {errors.email.message}
-          </p>
+          <p className="text-red-500 text-sm mb-2">{errors.email.message}</p>
         )}
 
         <label className="mb-1">Password</label>
@@ -57,9 +53,7 @@ function Login() {
           className="mb-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {errors.password && (
-          <p className="text-red-500 text-sm mb-2">
-            {errors.password.message}
-          </p>
+          <p className="text-red-500 text-sm mb-2">{errors.password.message}</p>
         )}
 
         <button

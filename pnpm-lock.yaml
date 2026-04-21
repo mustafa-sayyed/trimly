@@ -242,6 +242,9 @@ importers:
 
   worker:
     dependencies:
+      '@packages/config':
+        specifier: workspace:*
+        version: link:../packages/config
       '@packages/db':
         specifier: workspace:*
         version: link:../packages/db

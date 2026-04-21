@@ -7,7 +7,7 @@ const globalErrorHandler = (
   err: ApiError,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   logger.error(err.message, {
     statusCode: err.statusCode,
