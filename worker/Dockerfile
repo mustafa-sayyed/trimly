@@ -34,7 +34,7 @@ ENV NODE_ENV=production
 RUN corepack enable
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
-COPY server/package.json server/package.json
+COPY worker/package.json worker/package.json
 COPY packages/config/package.json packages/config/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/logging/package.json packages/logging/package.json
@@ -47,7 +47,7 @@ COPY --from=build /app/packages/db/generated ./packages/db/generated
 COPY --from=build /app/packages/logging/dist ./packages/logging/dist
 COPY --from=build /app/packages/queue/dist ./packages/queue/dist
 
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 USER node
 

@@ -47,7 +47,7 @@ COPY --from=build /app/packages/db/generated ./packages/db/generated
 COPY --from=build /app/packages/logging/dist ./packages/logging/dist
 COPY --from=build /app/packages/queue/dist ./packages/queue/dist
 
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 USER node
 

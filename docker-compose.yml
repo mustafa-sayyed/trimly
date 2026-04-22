@@ -31,12 +31,11 @@ services:
       - trimly-network
 
   server:
-    build:
-      context: .
-      dockerfile: server/Dockerfile
+    image: mustafasayyed/trimly-server:v1
     restart: unless-stopped
     env_file:
-      - ./server/.env.docker
+      - ./server/.env.production
+    command: ["pnpx", "migrate", "deploy"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,12 +47,10 @@ services:
       - trimly-network
 
   worker:
-    build:
-      context: .
-      dockerfile: worker/Dockerfile
+    image: mustafasayyed/trimly-worker:v1 
     restart: unless-stopped
     env_file:
-      - ./worker/.env.docker
+      - ./worker/.env.production
     depends_on:
       postgres:
         condition: service_healthy

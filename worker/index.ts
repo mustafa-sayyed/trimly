@@ -1,8 +1,8 @@
 import "dotenv/config";
-import "./services/sentry.js";
-import { prisma } from "./db/db.js";
-import { analyticsWorker } from "./worker.js";
-import { logger } from "./services/logger.js";
+import "./src/services/sentry.js";
+import { prisma } from "./src/db/db.js";
+import { analyticsWorker } from "./src/worker.js";
+import { logger } from "./src/services/logger.js";
 
 async function closeConnections() {
   try {
