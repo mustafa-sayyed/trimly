@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: trimly
+      POSTGRES_PASSWORD: trimly24291406
+      POSTGRES_DB: trimly
+    volumes:
+      - trimly_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trimly -d trimly"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trimly-network
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "trimly-redis@2429"]
+    volumes:
+      - trimly_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "trimly-redis@2429", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trimly-network
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./server/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    networks:
+      - trimly-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./worker/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - trimly-network
+
+volumes:
+  trimly_pgdata:
+  trimly_redisdata:
+
+networks:
+  trimly-network:
