@@ -8,6 +8,7 @@
     "dev": "tsx watch server.ts",
     "build": "tsc -b",
     "start": "node dist/server.js",
+    "start:migrate:prod": "pnpx prisma migrate deploy && node dist/server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

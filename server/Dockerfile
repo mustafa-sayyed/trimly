@@ -44,6 +44,8 @@ COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/packages/config/dist ./packages/config/dist
 COPY --from=build /app/packages/db/dist ./packages/db/dist
 COPY --from=build /app/packages/db/generated ./packages/db/generated
+COPY --from=build /app/packages/db/prisma ./server/prisma
+COPY --from=build /app/packages/db/dist/prisma.config.js ./server/
 COPY --from=build /app/packages/logging/dist ./packages/logging/dist
 COPY --from=build /app/packages/queue/dist ./packages/queue/dist
 
@@ -51,6 +53,6 @@ RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 USER node
 
-CMD ["pnpm", "--filter", "@trimly/server", "start"]
+CMD ["pnpm", "--filter", "@trimly/server", "start:migrate:prod"]
 
 

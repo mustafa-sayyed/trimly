@@ -35,7 +35,6 @@ services:
     restart: unless-stopped
     env_file:
       - ./server/.env.production
-    command: ["pnpx", "migrate", "deploy"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,7 +46,7 @@ services:
       - trimly-network
 
   worker:
-    image: mustafasayyed/trimly-worker:v1 
+    image: mustafasayyed/trimly-worker:v1
     restart: unless-stopped
     env_file:
       - ./worker/.env.production
