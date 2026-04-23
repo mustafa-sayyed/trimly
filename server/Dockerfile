@@ -53,6 +53,6 @@ RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 USER node
 
-CMD ["pnpm", "--filter", "@trimly/server", "start:migrate:prod"]
+CMD ["pnpm", "--filter", "@trimly/server", "start"]
 
 

@@ -30,6 +30,17 @@ services:
     networks:
       - trimly-network
 
+  migrate:
+    image: mustafasayyed/trimly-server:v1
+    env_file:
+      - ./server/.env.production
+    command: pnpm --dir server run migrate:deploy
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - trimly-network
+
   server:
     image: mustafasayyed/trimly-server:v1
     restart: unless-stopped
@@ -40,6 +51,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     ports:
       - "5000:5000"
     networks:
@@ -55,6 +68,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - trimly-network
 

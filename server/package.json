@@ -8,7 +8,7 @@
     "dev": "tsx watch server.ts",
     "build": "tsc -b",
     "start": "node dist/server.js",
-    "start:migrate:prod": "pnpx prisma migrate deploy && node dist/server.js",
+    "migrate:deploy": "pnpm exec prisma migrate deploy",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -29,6 +29,7 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "prisma": "^7.7.0",
     "ua-parser-js": "^2.0.9",
     "winston-transport": "^4.9.0",
     "zod": "^4.3.6"
