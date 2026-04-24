@@ -30,26 +30,31 @@ FROM node:22-alpine AS production
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV HUSKY=0
 
 RUN corepack enable
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
-COPY server/package.json server/package.json
-COPY packages/config/package.json packages/config/package.json
-COPY packages/db/package.json packages/db/package.json
-COPY packages/logging/package.json packages/logging/package.json
-COPY packages/queue/package.json packages/queue/package.json
+COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
+COPY --chown=node:node server/package.json server/package.json
+COPY --chown=node:node packages/config/package.json packages/config/package.json
+COPY --chown=node:node packages/db/package.json packages/db/package.json
+COPY --chown=node:node packages/logging/package.json packages/logging/package.json
+COPY --chown=node:node packages/queue/package.json packages/queue/package.json
 
-COPY --from=build /app/server/dist ./server/dist
-COPY --from=build /app/packages/config/dist ./packages/config/dist
-COPY --from=build /app/packages/db/dist ./packages/db/dist
-COPY --from=build /app/packages/db/generated ./packages/db/generated
-COPY --from=build /app/packages/db/prisma ./server/prisma
-COPY --from=build /app/packages/db/dist/prisma.config.js ./server/
-COPY --from=build /app/packages/logging/dist ./packages/logging/dist
-COPY --from=build /app/packages/queue/dist ./packages/queue/dist
+# Install dependencies
+RUN pnpm install --frozen-lockfile --prod
 
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+COPY --chown=node:node --from=build /app/server/dist ./server/dist
+COPY --chown=node:node --from=build /app/packages/config/dist ./packages/config/dist
+COPY --chown=node:node --from=build /app/packages/db/dist ./packages/db/dist
+COPY --chown=node:node --from=build /app/packages/db/generated ./packages/db/generated
+COPY --chown=node:node --from=build /app/packages/db/prisma ./server/prisma
+COPY --chown=node:node --from=build /app/packages/db/dist/prisma.config.js ./server/
+COPY --chown=node:node --from=build /app/packages/logging/dist ./packages/logging/dist
+COPY --chown=node:node --from=build /app/packages/queue/dist ./packages/queue/dist
+
+# Change ownership from root user to node
+RUN chown -R node:node /app
 
 USER node
 

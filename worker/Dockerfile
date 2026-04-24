@@ -40,6 +40,9 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/logging/package.json packages/logging/package.json
 COPY packages/queue/package.json packages/queue/package.json
 
+# Install dependencies
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+
 COPY --from=build /app/worker/dist ./worker/dist
 COPY --from=build /app/packages/config/dist ./packages/config/dist
 COPY --from=build /app/packages/db/dist ./packages/db/dist
@@ -47,7 +50,8 @@ COPY --from=build /app/packages/db/generated ./packages/db/generated
 COPY --from=build /app/packages/logging/dist ./packages/logging/dist
 COPY --from=build /app/packages/queue/dist ./packages/queue/dist
 
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+# Change ownership from root user to node user
+RUN chown -R node:node /app
 
 USER node
 

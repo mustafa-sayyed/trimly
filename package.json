@@ -10,7 +10,7 @@
     "lint": "pnpm -r --if-present run lint",
     "lint:fix": "pnpm -r --if-present run lint:fix",
     "format": "pnpm -r --if-present run format",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "lint-staged": "lint-staged"
   },
   "lint-staged": {
