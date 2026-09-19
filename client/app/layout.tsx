@@ -20,7 +20,30 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Trimly — Short links, sharper insights",
   description:
-    "Trimly is the fastest way to shorten links, customize slugs, set expiry dates and track every click.",
+    "Trimly is the fastest way to shorten links, customize slugs, set expiry dates and track every click",
+  openGraph: {
+    title: "Trimly — Short links, sharper insights",
+    description:
+      "Trimly is the fastest way to shorten links, customize slugs, set expiry dates and track every click",
+    url: "https://app.trimly.mustafasayyed.dev",
+    siteName: "Trimly",
+    images: [
+      {
+        url: "https://app.trimly.mustafasayyed.dev/trimly.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en-US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Trimly — Short links, sharper insights",
+    description:
+      "Trimly is the fastest way to shorten links, customize slugs, set expiry dates and track every click",
+    images: ["https://app.trimly.mustafasayyed.dev/trimly.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
